@@ -2,39 +2,32 @@ package com.codeprep.kafka.consumer;
 
 public class Tweet {
 
-	private String username;
-	private String msg;
-	private String timestamp;
-	
-	public Tweet(String username, String msg, String timestamp) {
-		super();
-		this.username = username;
-		this.msg = msg;
-		this.timestamp = timestamp;
+	private String created_at;
+	private String id_str;
+	private String text;
+
+	public String getCreated_at() {
+		return created_at;
 	}
 
-	public String getUsername() {
-		return username;
+	public void setCreated_at(String created_at) {
+		this.created_at = created_at;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public String getId_str() {
+		return id_str;
 	}
 
-	public String getMsg() {
-		return msg;
+	public void setId_str(String id_str) {
+		this.id_str = id_str;
 	}
 
-	public void setMsg(String msg) {
-		this.msg = msg;
+	public String getText() {
+		return text;
 	}
 
-	public String getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(String timestamp) {
-		this.timestamp = timestamp;
+	public void setText(String text) {
+		this.text = text;
 	}
 
 }
