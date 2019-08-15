@@ -12,10 +12,11 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.DeserializationConfig.Feature;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -39,17 +40,16 @@ public class KafkaElasticSearchConsumer {
 				ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
 				if(records != null) {
 					LOG.info("Recieved: {} records", records.count());
+					BulkRequest bulkRequest = new BulkRequest();
 					for(ConsumerRecord<String, String> record : records) {
 						if(record != null) {
 							
 							IndexRequest indexRequest = new IndexRequest("twitter", "tweet").source(prepareAndGetJSON(record.value()), XContentType.JSON);
-							IndexResponse response =  client.index(indexRequest, RequestOptions.DEFAULT);
-							String id = response.getId();
-							LOG.info("resp : {}", id);
-							Thread.sleep(10);
+							bulkRequest.add(indexRequest);
 						}
 					}
-					LOG.info("{}", "Committing offsets....");
+					BulkResponse bulkResponse = client.bulk(bulkRequest, RequestOptions.DEFAULT);
+					LOG.info("Committing offsets.... has failures {}", bulkResponse.hasFailures());
 					consumer.commitSync();
 					LOG.info("{}", "Offsets have been committed");
 					Thread.sleep(1000);
